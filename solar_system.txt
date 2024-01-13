@@ -1,0 +1,7 @@
+Mars 6.417e+23 3.389 1
+Earth 1.989e+30 6 1
+Jupiter 1.898e+27 7.784 1
+Saturn 5.682e+26 14 1
+Uranus 8.685e+25 28 1
+Neptune 1.024e+26 84 1
+Earth 1.989e+30 6 1
