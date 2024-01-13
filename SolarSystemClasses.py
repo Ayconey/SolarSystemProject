@@ -106,13 +106,11 @@ class SolarSystem:
     def __len__(self):
         return len(self.solar_objects)
 
-    def __add__(self, solar_object):
-        self.solar_objects.append(solar_object)
-        self.update_file()
 
     def __sub__(self, solar_object):
         self.solar_objects.remove(solar_object)
         self.update_file()
+        print(self.solar_objects)
 
     def __str__(self):
         # read the solar objects from the file
@@ -126,6 +124,18 @@ class SolarSystem:
 
         return str(objects)
 
+    def add(self, solar_object):
+        self.solar_objects.append(solar_object)
+        self.update_file()
+
+    def remove_item_from_string(self, item):
+        selected_item = item.split(" ")
+
+        for o in self.solar_objects:
+            if o.name == selected_item[0] and str(o.mass) == selected_item[1] and str(o.distance_to_sun) == selected_item[2] and str(o.period) == selected_item[3]:
+                self.solar_objects.remove(o)
+                break
+        self.update_file()
 
     def sort(self):
         # do zrobienia kubełkowo

@@ -1,5 +1,5 @@
 from SolarSystemClasses import SolarSystem, SolarObject
-
+from Ui import SolarSystemUI
 
 # example objects
 Earth = SolarObject("Earth", 1.989e30, 6, 1)
@@ -10,7 +10,6 @@ Uranus = SolarObject("Uranus", 8.685e25, 28, 1)
 Neptune = SolarObject("Neptune", 1.024e26, 84, 1)
 
 solar_system = SolarSystem([Earth, Mars, Jupiter, Saturn, Uranus, Neptune])
-print(solar_system)
-solar_system.sort()
-print(solar_system)
-solar_system += Earth
+
+UI = SolarSystemUI(solar_system)
+UI.show()
