@@ -18,16 +18,7 @@ class SolarObject:
     def __str__(self):
         return str(self.name) + " " + str(self.mass) + " " + str(self.distance_to_sun) + " " + str(self.period)
 
-    # def __cmp__(self, other):
-    #     if self.distance_to_sun != other.distance_to_sun:
-    #         return self.distance_to_sun < other.distance_to_sun
-    #
-    #     if self.mass != other.mass:
-    #         return self.mass < other.mass
-    #
-    #     return self.period < other.period
-
-    # idk trzeba znalezc pythonowa droge dobra, bo python mowi tak: "jebac obiektowosici!!!!" i idk jak on chce
+    # methods for comparisons
     def __lt__(self, other):
         if self.distance_to_sun != other.distance_to_sun:
             return self.distance_to_sun < other.distance_to_sun
@@ -124,7 +115,15 @@ class SolarSystem:
         self.update_file()
 
     def __str__(self):
-        objects = [str(o) for o in self.solar_objects]
+        # read the solar objects from the file
+        solar_system_file = open("solar_system.txt", "r")
+        objects = solar_system_file.readlines()
+        solar_system_file.close()
+
+        # replace \n with empty string
+        for i in range(0, len(objects)):
+            objects[i] = objects[i].replace("\n", "")
+
         return str(objects)
 
 
