@@ -14,6 +14,14 @@ class SolarSystemUI:
         self.window.title("Solar System")
         self.window.geometry("500x500")
 
+        # Set the dark theme
+        self.window.configure(bg="#383838")
+        style = ttk.Style()
+        style.theme_use("default")
+        style.configure(".", background="#383838", foreground="white", fieldbackground="#383838")
+        style.map('.', background=[('selected', 'black')], foreground=[('selected', 'white')])
+        style.map('Treeview', background=[('selected', '#4A6984')], foreground=[('selected', 'white')])
+
         self.up_triangle = tk.PhotoImage(file="up_triangle.png")
         self.down_triangle = tk.PhotoImage(file="down_triangle.png")
 
@@ -24,47 +32,46 @@ class SolarSystemUI:
         self.solar_system = copy.deepcopy(solar_system)
 
         # Fields for the user input
-        name_label = tk.Label(self.window, text="Name:")
+        name_label = tk.Label(self.window, text="Name:", bg="#383838", fg="white")
         name_label.pack()
-        self.name_entry = tk.Entry(self.window, width=30)
+        self.name_entry = tk.Entry(self.window, width=30, bg="#383838", fg="white")
         self.name_entry.pack()
 
-        mass_label = tk.Label(self.window, text="Mass:")
+        mass_label = tk.Label(self.window, text="Mass:", bg="#383838", fg="white")
         mass_label.pack()
-        self.mass_entry = tk.Entry(self.window, width=30)
+        self.mass_entry = tk.Entry(self.window, width=30, bg="#383838", fg="white")
         self.mass_entry.pack()
 
-        distance_label = tk.Label(self.window, text="Distance to Sun:")
+        distance_label = tk.Label(self.window, text="Distance to Sun:", bg="#383838", fg="white")
         distance_label.pack()
-        self.distance_entry = tk.Entry(self.window, width=30)
+        self.distance_entry = tk.Entry(self.window, width=30, bg="#383838", fg="white")
         self.distance_entry.pack()
 
-        period_label = tk.Label(self.window, text="Orbital Period:")
+        period_label = tk.Label(self.window, text="Orbital Period:", bg="#383838", fg="white")
         period_label.pack()
-        self.period_entry = tk.Entry(self.window, width=30)
+        self.period_entry = tk.Entry(self.window, width=30, bg="#383838", fg="white")
         self.period_entry.pack()
 
         # Buttons
-        add_button = tk.Button(self.window, text="Add", command=self.add_item)
+        add_button = tk.Button(self.window, text="Add", command=self.add_item, bg="#383838", fg="white")
         add_button.pack()
 
         # Create a frame for the buttons
-        button_frame = tk.Frame(self.window)
+        button_frame = tk.Frame(self.window, bg="#383838")
         button_frame.pack()
 
         # Buttons
-        open_button = tk.Button(button_frame, text="Open", command=self.open_file)
+        open_button = tk.Button(button_frame, text="Open", command=self.open_file, bg="#383838", fg="white")
         open_button.pack(side=tk.RIGHT, padx=1)
 
-        save_as_button = tk.Button(button_frame, text="Save as", command=self.save_as)
+        save_as_button = tk.Button(button_frame, text="Save as", command=self.save_as, bg="#383838", fg="white")
         save_as_button.pack(side=tk.RIGHT, padx=1)
 
-        save_button = tk.Button(button_frame, text="Save", command=self.save)
+        save_button = tk.Button(button_frame, text="Save", command=self.save, bg="#383838", fg="white")
         save_button.pack(side=tk.RIGHT, padx=1)
 
         # Treeview for showing the solar system data in a table
-        self.treeview = ttk.Treeview(self.window, columns=("#", "name", "mass", "distance_to_sun", "period"),
-                                    show="headings")
+        self.treeview = ttk.Treeview(self.window, columns=("#", "name", "mass", "distance_to_sun", "period"), show="headings", selectmode='extended')
 
         # Set the column headings and widths
         self.treeview.heading("#", text="#")
@@ -77,7 +84,7 @@ class SolarSystemUI:
         self.treeview.column("mass", width=100, anchor=tk.E)
 
         self.treeview.heading("distance_to_sun", text="Distance to Sun",
-                            command=lambda: self.sort_column("distance_to_sun"))
+                              command=lambda: self.sort_column("distance_to_sun"))
         self.treeview.column("distance_to_sun", width=100, anchor=tk.E)
 
         self.treeview.heading("period", text="Period", command=lambda: self.sort_column("period"))
@@ -88,12 +95,16 @@ class SolarSystemUI:
 
         # Add data to the Treeview widget
         for i, obj in enumerate(self.solar_system.solar_objects, start=1):
-            self.treeview.insert("", "end", values=(i, obj.name, obj.mass, obj.distance_to_sun, obj.period))
+            self.treeview.insert("", "end", values=(i, obj.name, obj.mass, obj.distance_to_sun, obj.period),
+                                 tags=('row',))
+
+        # Change the color of the rows
+        self.treeview.tag_configure('row', background='#383838', foreground='white')
 
         # Pack the Treeview widget into the window
         self.treeview.pack()
 
-        delete_button = tk.Button(self.window, text="Delete", command=self.delete_item)
+        delete_button = tk.Button(self.window, text="Delete", command=self.delete_item, bg="#383838", fg="white")
         delete_button.pack()
 
         # Start the main loop
@@ -134,7 +145,7 @@ class SolarSystemUI:
 
         # update the Treeview
         self.treeview.insert("", "end",
-                             values=(len(self.solar_system.solar_objects), name, mass, distance_to_sun, period))
+                             values=(len(self.solar_system.solar_objects), name, mass, distance_to_sun, period), tags=('row',))
 
         # clear the entry fields
         self.name_entry.delete(0, tk.END)
@@ -146,7 +157,8 @@ class SolarSystemUI:
         selected_items = self.treeview.selection()
         for item in selected_items:
             # get the ordinal number of the object to remove
-            ordinal_to_remove = int(self.treeview.item(item)['values'][0]) - 1  # subtract 1 because list indices start at 0
+            ordinal_to_remove = int(
+                self.treeview.item(item)['values'][0]) - 1  # subtract 1 because list indices start at 0
 
             # check if the ordinal number is valid
             if 0 <= ordinal_to_remove < len(self.solar_system.solar_objects):
@@ -159,7 +171,7 @@ class SolarSystemUI:
 
         # refresh the Treeview
         for i, obj in enumerate(self.solar_system.solar_objects, start=1):
-            self.treeview.insert("", "end", values=(i, obj.name, obj.mass, obj.distance_to_sun, obj.period))
+            self.treeview.insert("", "end", values=(i, obj.name, obj.mass, obj.distance_to_sun, obj.period), tags=('row',))
 
     def save(self):
         if self.current_file is None:
@@ -199,7 +211,7 @@ class SolarSystemUI:
 
             # refresh the Treeview
             for i, obj in enumerate(self.solar_system.solar_objects, start=1):
-                self.treeview.insert("", "end", values=(i, obj.name, obj.mass, obj.distance_to_sun, obj.period))
+                self.treeview.insert("", "end", values=(i, obj.name, obj.mass, obj.distance_to_sun, obj.period), tags=('row',))
 
     def load_from_file(self, filename):
         with open(filename, 'r') as file:
@@ -219,7 +231,7 @@ class SolarSystemUI:
 
         # Refresh the Treeview
         for i, obj in enumerate(self.solar_system.solar_objects, start=1):
-            self.treeview.insert("", "end", values=(i, obj.name, obj.mass, obj.distance_to_sun, obj.period))
+            self.treeview.insert("", "end", values=(i, obj.name, obj.mass, obj.distance_to_sun, obj.period), tags=('row',))
 
         # Set the column header image and text
         for col in self.treeview['columns']:
