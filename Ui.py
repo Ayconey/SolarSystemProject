@@ -1,6 +1,7 @@
 import copy
 import csv
 import tkinter as tk
+from tkinter import messagebox
 from tkinter import filedialog
 from tkinter import ttk
 from SolarSystemClasses import SolarSystem, SolarObject
@@ -110,12 +111,19 @@ class SolarSystemUI:
         period = self.period_entry.get()
 
         # error handling
-        if name == "" or mass == "" or distance_to_sun == "" or period == "":
-            raise ValueError("Please fill in all the fields")
-            return
+        try:
+            if name == "" or mass == "" or distance_to_sun == "" or period == "":
+                raise ValueError("All fields must be filled. None of the fields can be empty.")
 
-        if mass.isnumeric() is False or distance_to_sun.isnumeric() is False or period.isnumeric() is False:
-            raise ValueError("Bad type of one or more fields, mass, distance and period must be numbers")
+            # handle scientific notation and negative values
+            mass = float(mass)
+            distance_to_sun = float(distance_to_sun)
+            period = float(period)
+
+            if mass < 0 or distance_to_sun < 0 or period < 0:
+                raise ValueError("Mass, distance to sun, and period must be non-negative.")
+        except ValueError as e:
+            messagebox.showerror("Input Error", str(e))
             return
 
         # create a new solar object
@@ -167,6 +175,22 @@ class SolarSystemUI:
     def open_file(self):
         filename = filedialog.askopenfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
         if filename:
+            # verify the input
+            with open(filename, 'r') as f:
+                reader = csv.reader(f)
+                for row in reader:
+                    if len(row) != 4:
+                        messagebox.showerror("Input Error", "Each row must have 4 columns.")
+                        return
+                    name, mass, distance_to_sun, period = row
+                    try:
+                        float(mass)
+                        float(distance_to_sun)
+                        float(period)
+                    except ValueError:
+                        messagebox.showerror("Input Error", "The last three columns must be convertible to a float.")
+                        return
+
             self.solar_system.load_from_file(filename)
 
             # clear the Treeview
