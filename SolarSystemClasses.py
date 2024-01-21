@@ -1,3 +1,5 @@
+import csv
+
 def cmp(a, b):
     x = a - b
     if x < 0:
@@ -96,60 +98,83 @@ class SolarSystem:
     Solar system class
     """
 
-    def __init__(self, solar_objects):
+    def __init__(self, solar_objects=None):
         """
         :param solar_objects: list of solar objects
         """
         self.solar_objects = solar_objects
-        self.update_file()
+
+    def save_to_file(self, filename):
+        with open(filename, 'w', newline='') as file:
+            writer = csv.writer(file)
+            for obj in self.solar_objects:
+                writer.writerow([obj.name, obj.mass, obj.distance_to_sun, obj.period])
+
+    def load_from_file(self, filename):
+        with open(filename, 'r') as file:
+            reader = csv.reader(file)
+            self.solar_objects = [SolarObject(*row) for row in reader]
 
     def __len__(self):
         return len(self.solar_objects)
 
-
     def __sub__(self, solar_object):
         self.solar_objects.remove(solar_object)
-        self.update_file()
         print(self.solar_objects)
 
     def __str__(self):
-        # read the solar objects from the file
-        solar_system_file = open("solar_system.txt", "r")
-        objects = solar_system_file.readlines()
-        solar_system_file.close()
-
-        # replace \n with empty string
-        for i in range(0, len(objects)):
-            objects[i] = objects[i].replace("\n", "")
-
-        return str(objects)
+        return str(self.solar_objects)
 
     def add(self, solar_object):
         self.solar_objects.append(solar_object)
-        self.update_file()
 
     def remove_item_from_string(self, item):
         selected_item = item.split(" ")
 
         for o in self.solar_objects:
-            if o.name == selected_item[0] and str(o.mass) == selected_item[1] and str(o.distance_to_sun) == selected_item[2] and str(o.period) == selected_item[3]:
+            if o.name == selected_item[0] and str(o.mass) == selected_item[1] and str(o.distance_to_sun) == \
+                    selected_item[2] and str(o.period) == selected_item[3]:
                 self.solar_objects.remove(o)
                 break
-        self.update_file()
 
-    def sort(self):
-        # do zrobienia kubełkowo
-        self.solar_objects.sort()
-        self.update_file()
+    def sort(self, criteria, reversed=False):
+        # Define a function to get the key for sorting based on the specified criteria
+        def get_key(obj):
+            if criteria == 'mass':
+                return obj.mass
+            elif criteria == 'distance_to_sun':
+                return obj.distance_to_sun
+            elif criteria == 'period':
+                return obj.period
+            else:
+                # If an invalid criteria is provided, default to sorting by name
+                return obj.name
 
-    def sort_by(self, criteria):
-        # do zrobienia kubełkowo
-        pass
+        # Create buckets to store SolarObjects
+        buckets = {}
 
-    def update_file(self):
-        # create a file to store the solar system
-        solar_system_file = open("solar_system.txt", "w")
-        # Add solar objects to the solar system file
+        # Distribute SolarObjects into buckets based on the chosen criteria
         for solar_object in self.solar_objects:
-            solar_system_file.write(str(solar_object) + "\n")
-        solar_system_file.close()
+            key = get_key(solar_object)
+            if key in buckets:
+                buckets[key].append(solar_object)
+            else:
+                buckets[key] = [solar_object]
+
+        # Sort each bucket individually (using any sorting algorithm, e.g., built-in sorted function)
+        for key in buckets:
+            buckets[key] = sorted(buckets[key], key=lambda x: x.name, reverse=reversed)
+
+        # Concatenate sorted buckets to get the final sorted list
+        sorted_solar_objects = []
+        for key in sorted(buckets.keys(), reverse=reversed):
+            sorted_solar_objects.extend(buckets[key])
+
+        # Update the SolarSystem's solar_objects attribute with the sorted list
+        self.solar_objects = sorted_solar_objects
+
+    def remove(self, name):
+        for solar_object in self.solar_objects:
+            if solar_object.name == name:
+                self.solar_objects.remove(solar_object)
+                break
