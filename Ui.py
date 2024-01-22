@@ -71,7 +71,8 @@ class SolarSystemUI:
         save_button.pack(side=tk.RIGHT, padx=1)
 
         # Treeview for showing the solar system data in a table
-        self.treeview = ttk.Treeview(self.window, columns=("#", "name", "mass", "distance_to_sun", "period"), show="headings", selectmode='extended')
+        self.treeview = ttk.Treeview(self.window, columns=("#", "name", "mass", "distance_to_sun", "period"),
+                                     show="headings", selectmode='extended')
 
         # Set the column headings and widths
         self.treeview.heading("#", text="#")
@@ -95,7 +96,9 @@ class SolarSystemUI:
 
         # Add data to the Treeview widget
         for i, obj in enumerate(self.solar_system.solar_objects, start=1):
-            self.treeview.insert("", "end", values=(i, obj.name, obj.mass, obj.distance_to_sun, obj.period),
+            self.treeview.insert("", "end", values=(
+                i, obj.name, "{:.2e}".format(obj.mass), "{:.2e}".format(obj.distance_to_sun),
+                "{:.2e}".format(obj.period)),
                                  tags=('row',))
 
         # Change the color of the rows
@@ -126,6 +129,11 @@ class SolarSystemUI:
             if name == "" or mass == "" or distance_to_sun == "" or period == "":
                 raise ValueError("All fields must be filled. None of the fields can be empty.")
 
+            # Check if name already exists in solar_objects
+            for obj in self.solar_system.solar_objects:
+                if obj.name == name:
+                    raise ValueError("An item with this name already exists.")
+
             # handle scientific notation and negative values
             mass = float(mass)
             distance_to_sun = float(distance_to_sun)
@@ -145,7 +153,9 @@ class SolarSystemUI:
 
         # update the Treeview
         self.treeview.insert("", "end",
-                             values=(len(self.solar_system.solar_objects), name, mass, distance_to_sun, period), tags=('row',))
+                             values=(len(self.solar_system.solar_objects), name, "{:.2e}".format(mass),
+                                     "{:.2e}".format(distance_to_sun), "{:.2e}".format(period)),
+                             tags=('row',))
 
         # clear the entry fields
         self.name_entry.delete(0, tk.END)
@@ -171,7 +181,10 @@ class SolarSystemUI:
 
         # refresh the Treeview
         for i, obj in enumerate(self.solar_system.solar_objects, start=1):
-            self.treeview.insert("", "end", values=(i, obj.name, obj.mass, obj.distance_to_sun, obj.period), tags=('row',))
+            self.treeview.insert("", "end", values=(
+                i, obj.name, "{:.2e}".format(obj.mass), "{:.2e}".format(obj.distance_to_sun),
+                "{:.2e}".format(obj.period)),
+                                 tags=('row',))
 
     def save(self):
         if self.current_file is None:
@@ -187,21 +200,26 @@ class SolarSystemUI:
     def open_file(self):
         filename = filedialog.askopenfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
         if filename:
-            # verify the input
-            with open(filename, 'r') as f:
-                reader = csv.reader(f)
-                for row in reader:
-                    if len(row) != 4:
-                        messagebox.showerror("Input Error", "Each row must have 4 columns.")
-                        return
-                    name, mass, distance_to_sun, period = row
-                    try:
-                        float(mass)
-                        float(distance_to_sun)
-                        float(period)
-                    except ValueError:
-                        messagebox.showerror("Input Error", "The last three columns must be convertible to a float.")
-                        return
+            try:
+                # verify the input
+                with open(filename, 'r', encoding='utf-8') as f:
+                    reader = csv.reader(f)
+                    for row in reader:
+                        if len(row) != 4:
+                            messagebox.showerror("Input Error", "Each row must have 4 columns.")
+                            return
+                        name, mass, distance_to_sun, period = row
+                        try:
+                            float(mass)
+                            float(distance_to_sun)
+                            float(period)
+                        except ValueError:
+                            messagebox.showerror("Input Error",
+                                                 "The last three columns must be convertible to a float.")
+                            return
+            except UnicodeDecodeError:
+                messagebox.showerror("Encoding Error", "File encoding must be UTF-8.")
+                return
 
             self.solar_system.load_from_file(filename)
 
@@ -211,7 +229,9 @@ class SolarSystemUI:
 
             # refresh the Treeview
             for i, obj in enumerate(self.solar_system.solar_objects, start=1):
-                self.treeview.insert("", "end", values=(i, obj.name, obj.mass, obj.distance_to_sun, obj.period), tags=('row',))
+                self.treeview.insert("", "end", values=(
+                    i, obj.name, "{:.2e}".format(obj.mass), "{:.2e}".format(obj.distance_to_sun),
+                    "{:.2e}".format(obj.period)), tags=('row',))
 
     def load_from_file(self, filename):
         with open(filename, 'r') as file:
@@ -231,7 +251,10 @@ class SolarSystemUI:
 
         # Refresh the Treeview
         for i, obj in enumerate(self.solar_system.solar_objects, start=1):
-            self.treeview.insert("", "end", values=(i, obj.name, obj.mass, obj.distance_to_sun, obj.period), tags=('row',))
+            self.treeview.insert("", "end", values=(
+                i, obj.name, "{:.2e}".format(obj.mass), "{:.2e}".format(obj.distance_to_sun),
+                "{:.2e}".format(obj.period)),
+                                 tags=('row',))
 
         # Set the column header image and text
         for col in self.treeview['columns']:
