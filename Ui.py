@@ -1,10 +1,24 @@
 import copy
 import csv
+
 import tkinter as tk
-from tkinter import messagebox
 from tkinter import filedialog
+from tkinter import messagebox
 from tkinter import ttk
-from SolarSystemClasses import SolarSystem, SolarObject
+
+from SolarSystemClasses import SolarObject
+
+
+def format_number(num, precision=2):
+    """
+    Format a number to a string with a given precision
+    :param num: number to be formatted
+    :param precision: number of decimal places
+    """
+    if abs(num) >= 1e6 or abs(num) < 1e-2:
+        return format(num, f".{precision}e")
+    else:
+        return format(num, f".{precision}f").rstrip('0').rstrip('.')
 
 
 class SolarSystemUI:
@@ -96,9 +110,9 @@ class SolarSystemUI:
 
         # Add data to the Treeview widget
         for i, obj in enumerate(self.solar_system.solar_objects, start=1):
-            self.treeview.insert("", "end", values=(
-                i, obj.name, "{:.2e}".format(obj.mass), "{:.2e}".format(obj.distance_to_sun),
-                "{:.2e}".format(obj.period)),
+            self.treeview.insert("", "end",
+                                 values=(i, obj.name, format_number(obj.mass), format_number(obj.distance_to_sun),
+                                         format_number(obj.period)),
                                  tags=('row',))
 
         # Change the color of the rows
@@ -131,7 +145,7 @@ class SolarSystemUI:
 
             # Check if name already exists in solar_objects
             for obj in self.solar_system.solar_objects:
-                if obj.name == name:
+                if obj.name.lower() == name.lower():
                     raise ValueError("An item with this name already exists.")
 
             # handle scientific notation and negative values
@@ -153,9 +167,8 @@ class SolarSystemUI:
 
         # update the Treeview
         self.treeview.insert("", "end",
-                             values=(len(self.solar_system.solar_objects), name, "{:.2e}".format(mass),
-                                     "{:.2e}".format(distance_to_sun), "{:.2e}".format(period)),
-                             tags=('row',))
+                             values=(len(self.solar_system.solar_objects), name, format_number(mass),
+                                     format_number(distance_to_sun), format_number(period)), tags=('row',))
 
         # clear the entry fields
         self.name_entry.delete(0, tk.END)
@@ -181,9 +194,9 @@ class SolarSystemUI:
 
         # refresh the Treeview
         for i, obj in enumerate(self.solar_system.solar_objects, start=1):
-            self.treeview.insert("", "end", values=(
-                i, obj.name, "{:.2e}".format(obj.mass), "{:.2e}".format(obj.distance_to_sun),
-                "{:.2e}".format(obj.period)),
+            self.treeview.insert("", "end",
+                                 values=(i, obj.name, format_number(obj.mass), format_number(obj.distance_to_sun),
+                                         format_number(obj.period)),
                                  tags=('row',))
 
     def save(self):
@@ -229,9 +242,10 @@ class SolarSystemUI:
 
             # refresh the Treeview
             for i, obj in enumerate(self.solar_system.solar_objects, start=1):
-                self.treeview.insert("", "end", values=(
-                    i, obj.name, "{:.2e}".format(obj.mass), "{:.2e}".format(obj.distance_to_sun),
-                    "{:.2e}".format(obj.period)), tags=('row',))
+                self.treeview.insert("", "end",
+                                     values=(i, obj.name, format_number(obj.mass), format_number(obj.distance_to_sun),
+                                             format_number(obj.period)),
+                                     tags=('row',))
 
     def load_from_file(self, filename):
         with open(filename, 'r') as file:
@@ -252,8 +266,7 @@ class SolarSystemUI:
         # Refresh the Treeview
         for i, obj in enumerate(self.solar_system.solar_objects, start=1):
             self.treeview.insert("", "end", values=(
-                i, obj.name, "{:.2e}".format(obj.mass), "{:.2e}".format(obj.distance_to_sun),
-                "{:.2e}".format(obj.period)),
+            i, obj.name, format_number(obj.mass), format_number(obj.distance_to_sun), format_number(obj.period)),
                                  tags=('row',))
 
         # Set the column header image and text

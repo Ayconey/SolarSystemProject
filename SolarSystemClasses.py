@@ -1,5 +1,6 @@
 import csv
 
+
 def cmp(a, b):
     x = a - b
     if x < 0:
